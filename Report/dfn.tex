@@ -1,0 +1,59 @@
+\newcommand{\blue}[1]{{\color{blue} #1}}
+\newcommand{\red}[1]{{\color{red} #1}}
+\newcommand{\orange}[1]{{\color{orange} #1}}
+
+% math symbol definitions
+\newcommand{\mat}[1]{\mathbf{#1}}
+\newcommand{\ve}[1]{\mathbf{#1}}
+\newcommand{\set}[1]{\mathbb{#1}}
+\newcommand{\seq}[2]{\mathcal{#1}^{#2}}
+
+% paper-dependent definitions
+\newcommand{\User}{\set{U}}
+\newcommand{\Item}{\set{I}}
+\newcommand{\Su}{\seq{S}{u}}
+
+% pre-defined names
+\newcommand{\methodname}{\textsc{MC-LSTM}}
+\newcommand{\method}{\methodname\space}
+\newcommand{\lstmcatname}{\textsc{LSTM-CAT}}
+\newcommand{\lstmcat}{\lstmcatname\space}
+\newcommand{\thicktilde}[1]{\mathbf{\tilde{\text{$#1$}}}}
+\newcommand{\npair}[1]{{\text{$#1$}}^{(n)}}
+\newcommand{\onepair}[1]{{\text{$#1$}}^{(1)}}
+
+\newcommand{\methodWODropName}{\textsc{w/oDrop}}
+\newcommand{\methodWOAttName}{\textsc{w/oAttn}}
+\newcommand{\methodWODrop}{\methodWODropName\space}
+\newcommand{\methodWOAtt}{\methodWOAttName\space}
+
+\newcommand{\compPopName}{\textsc{POP}}
+\newcommand{\compPop}{\compPopName\space}
+
+\newcommand{\compLSTMName}{\textsc{LSTM}}
+\newcommand{\compLSTM}{\compLSTMName\space}
+
+\newcommand{\compGruRecName}{\textsc{GRU4Rec}}
+\newcommand{\compGruRec}{\compGruRecName\space}
+
+\newcommand{\compYahooName}{S.Okura et al.\cite{Yahoo2017}}
+\newcommand{\compYahoo}{\compYahooName\space}
+
+\newcommand{\compNaverName}{K.Park et al.\cite{Naver2017}}
+\newcommand{\compNaver}{\compNaverName\space}
+
+\newcommand{\dataAdressaName}{\textsc{Adressa}}
+\newcommand{\dataAdressa}{\dataAdressaName\space}
+
+\newcommand{\dataGloboName}{\textsc{Globo}}
+\newcommand{\dataGlobo}{\dataGloboName\space}
+
+\newcommand{\dataAdressaOneWeekName}{\textsc{Adressa 1W}}
+\newcommand{\dataAdressaOneWeek}{\dataAdressaOneWeekName\space}
+
+\newcommand{\dataAdressaTenWeekName}{\textsc{Adressa 10W}}
+\newcommand{\dataAdressaTenWeek}{\dataAdressaTenWeekName\space}
+
+% table
+\newcolumntype{C}[1]{>{\centering\arraybackslash}m{#1}}   %% centered
+\newcolumntype{R}[1]{>{\raggedleft\arraybackslash}m{#1}}  %% right aligned

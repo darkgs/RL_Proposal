@@ -1,0 +1,105 @@
+%\documentclass[sigconf, review, anonymous, screen]{acmart}
+\documentclass[sigconf, screen]{acmart}
+% The preceding line is only needed to identify funding in the first footnote. If that is unneeded, please comment it out.
+\usepackage{kotex}
+\usepackage{amsmath,amssymb,amsfonts}
+\usepackage{algorithmic}
+\usepackage{graphicx}
+\usepackage{textcomp}
+\usepackage{xcolor}
+\usepackage{balance}
+
+\usepackage[ruled,vlined,linesnumbered]{algorithm2e}
+
+\usepackage{booktabs} % For formal tables
+\usepackage{subcaption} % for subfigures
+
+\usepackage{fancyhdr}
+\usepackage{tabularx}
+\usepackage{multirow}
+\usepackage{multicol}
+\usepackage{mdwlist}
+\usepackage{indentfirst}
+\usepackage{physics}
+\usepackage{xspace}
+\usepackage{tablefootnote}
+%\usepackage[bottom]{footmisc}
+%\usepackage{footnote}
+\usepackage{hyperref}
+\usepackage{makecell}
+\usepackage{subcaption}
+\usepackage[bottom]{footmisc}
+\usepackage{balance}
+\xspaceaddexceptions{]\}}
+
+\setcopyright{none}
+\renewcommand\footnotetextcopyrightpermission[1]{}
+\settopmatter{printacmref=false}
+
+
+%\acmConference[KDD'19]{ACM SIGKDD Conference}{Aug 2019}{Anchorage, Alaska USA}
+\acmConference[]{}{}{}
+\acmYear{2019}
+\copyrightyear{2019}
+
+% Definitions
+\input{./dfn}
+%\setlength{\belowcaptionskip}{-0.3cm}
+
+\begin{document}
+\title[Super Mario RL]{대규모 데이터분석 특강 - 프로젝트 제안서}
+
+\author{구본헌}
+\affiliation{
+  \institution{컴퓨터 공학부}
+  \institution{서울대학교}
+}
+\email{darkgs@snu.ac.kr}
+
+\author{김정훈}
+\affiliation{
+  \institution{컴퓨터 공학부}
+  \institution{서울대학교}
+}
+\email{@snu.ac.kr}
+
+% Sec 0. Abstract
+\begin{abstract}
+블라블라
+\end{abstract}
+
+%\keywords{
+%Reinforcement Learning; 강화 학습
+%}
+
+\maketitle
+% Sec 1. Introduction
+\section{Introduction}
+\input{./010intro}
+
+\section{Survey}
+\input{./020survey_0}
+\input{./020survey_1}
+\input{./020survey_2}
+\input{./020survey_3}
+\input{./020survey_4}
+\input{./020survey_5}
+
+\section{Proposed Method}
+
+\section{Development Plan}
+개발 환경
+
+일정
+
+\section{Conclusion}
+\label{sec:conclusion}
+\input{./060conclusion}
+
+\newpage
+\balance
+\bibliographystyle{IEEEtran}
+\bibliography{paper}
+
+\end{document}
+

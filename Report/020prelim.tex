@@ -1,0 +1,55 @@
+
+%We review the Recurrent Neural Networks (RNN) which is designed for extracting features from the sequence of inputs~\cite{GuideToRNN, RNNReview}.
+To understand basis of our proposed method, we review the vanilla recurrent neural network (RNN) function in Section~\ref{sec:pre:rnn} and the long short-term memory (LSTM) in Section~\ref{sec:pre:lstm}.
+%We see the vanilla RNN model and the Long Short-Term Memory (LSTM)~\cite{LSTM} proposed by S. Hochreiter et al. to solve the vanishing and exploding gradients problem which is known that the vanilla RNN-based models suffer from this problem.
+
+\subsection{Recurrent Neural Networks}
+\label{sec:pre:rnn}
+Many pieces of research use RNN-based method to extract latent features from given session-based data.
+RNN accumulates features from a previous input sequence to the hidden state for making applications like predicting next item in session~\cite{GuideToRNN, RNNReview}.
+%RNN-based model concatenates vector of features from previous sequence and vector of the latest input to predict the next item in session~\cite{GuideToRNN, RNNReview}.
+
+The vanilla RNN is constructed as follows:
+\begin{align*}
+	h_t &= f(h_{t-1},x_t;W,b) \\
+		&= \tanh{(W_{hh}h_{t-1}+W_{hx}x_t+b_h)} \\
+		&= \tanh{(W_{h}[h_{t-1},x_t]+b_h)}
+\end{align*}
+where recurrent function $f$ consists of parameters $W$ and $b$, the hidden state of a previous time $h_{t-1}$ as one of the arguments, and current input $x_t$ as the other.
+%where a recurrent function $f$, which contains parameters $W$ and $b$, has arguments which are privious hidden state $h_{t-1}$ and current input $x_t$.
+%where $h_t$ indicates the hidden state of the network at time $t$, and $f$ represents a recurrent function which has inputs as $h$ and $x$, and parameters as $W$ and $b$.
+%$h_t$ indicates the hidden state of RNN at time $t$.
+The notation, $\tanh$, denotes hyperbolic tangent function.
+$W_{hx} \in \mathbb{R}^{dim(h) \times dim(x)}$ is a parameter matrix where $dim(x)$ means the dimension of a vector $x$, and $b_h \in \mathbb{R}^{dim(h)}$ is a bias term.
+%$\tanh$ denotes the hyperbolic tangent function, $W_{hx} \in \mathbb{R}^{dim(h) \times dim(x)}$ is a parameter matrix where $dim(x)$ means the dimension of a vector $x$, and $b_h \in \mathbb{R}^{dim(h)}$ is a bias term.
+We abbreviate $W_{hh}h_{t-1}+W_{hx}x_t$ to $W_h[h_{t-1}+x_t]$ for brevity.
+
+\subsection{Long Short Term Memory}
+\label{sec:pre:lstm}
+Vanilla RNN-based model is not well trained because of the vanishing and exploding gradients problem~\cite{Vanish}.
+To keep gradients for long-term, LSTM manages cell state~\cite{LSTM}, so-called gradient highway, to propagate gradients more efficiently.
+
+The LSTM is constructed as follows:
+\begin{align*}
+	g_{f_t} &= \sigma(W_{g_f}[h_{t-1},x_t]+b_{g_f}) \\
+	g_{i_t} &= \sigma(W_{g_i}[h_{t-1},x_t]+b_{g_i}) \\
+	g_{o_t} &= \sigma(W_{g_o}[h_{t-1},x_t]+b_{g_o}) \\
+	\tilde{c}_t &= \tanh(W_c[h_{t-1},x_t]+b_c) \\
+	c_t &= g_{f_t}*c_{t-1}+g_{i_t}*\tilde{c}_t \\
+	h_t &= g_{o_t}*\tanh(c_t)
+\end{align*}
+where degree of updating hidden state is controlled by gate units which are $g_{f_t}$, $g_{i_t}$, and $g_{o_t}$ standing for the forget, input, and the output gate, respectively.
+$\sigma$ notates the sigmoid function, $c_t$ indicates cell state at time $t$, and $*$ is element-wise product.
+
+\begin{figure}[h]
+\begin{center}
+\begin{tabular}{cc}
+     \includegraphics[width=0.40\textwidth]{FIG/LSTM.png} \\
+\end{tabular}
+\caption{
+	An illustration of LSTM implementation.
+}
+\label{fig:lstm}
+\end{center}
+\end{figure}
+

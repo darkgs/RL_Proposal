@@ -1,0 +1,321 @@
+%The main motivation behind our method
+%is to handle spikes carefully.
+%Since the input signals are noisy, with bursty noise,
+%traditional methods like time-warping and wavelets
+%will focus on the spikes, and ignore the rest of the signal,
+%giving misleading results.
+
+%Our proposed method is as follows: 
+%We will use the spike-detection method of $\ldots$,
+%to remove spikes, and only then,  we use the $k$ strongest
+%Daubechies-4 wavelet coefficients, to compare the two (spike-removed)
+%sound clips.
+
+%\subsection{Sequence Graph}
+%Most of the watching sequences are short because people watch news articles in their spare time which means frequently but not a long time.
+%With the same reason, they are not logged-in on the service so it is hard to find features from sequences for the specific user in the previous session.
+%By the focus on the news article itself, we extract more meaningful features from the watching sequence to increase understanding about the article when generating embed vector of it.
+%The main idea of the sequence graph, one of our proposed method, is that news articles which have similar sequence pattern also have similar characters.
+%For example, Let $a_0$, $a_1$, $a_2$ and $a_3$ represent independent news articles in the service.
+%And let $a_0 \rightarrow a_1$ means there is a pattern after watching $a_0$ the user watched $a_1$ in the sequence.
+%If we find many patterns like $a_0 \rightarrow a_1 \rightarrow a_2$ and $a_0 \rightarrow a_3 \rightarrow a_2$, we can say that users think $a_1$ and $a_2$ as similar.
+%
+%\subsection{Additional Article Embedding}
+%Tons of news articles are published every day by the various publishers.
+%Not only the unique issue for each article, but similar issues also deal with many articles especially which is important for today.
+%Figuriing out the similarity between articles is important when we extract features from the sequences of news watching.
+%Letting vectors of similar articles place in close will make the recommendation system understand the sequence of vectors more efficiently and help to do the more correct recommendation.
+%The intuition of this part is that get some clue of features from the sequence graph to utilize when generating embedding vector.
+
+%%%%%
+
+%One of the simple but powerful recommendation method is counting the popular items among the timestamp then recommend these items to the next user.
+%This simple method gives us a strong baseline score in the real world dataset.
+%We focus on this ground truth then decided to give this trendy informantion to model directly as the input.
+%In the case of a news article, recency also an important factor to attract users.
+%When news articles talk about the same topics in the specific timestamp, users want to see most updated information from the article.
+%So we add not popular enough but most recent articles to trendy information.
+%
+%Selecting the RNN based model is one of a common approach to recommend the next item given sequence of previous selections.
+%But RNN infers the next item only given previous items not considering the situation at the inference time.
+%For example, given a previous selection for a user, a model may recommend the same item after 5 minutes after last selection and even a day after.
+%We generate trendy information at the inference time not the most recent selection time to give current trendy information directly to the model.
+
+%%%%%
+
+%We propose the \method which aggregates the prevalent and the personal preferences to do the accurate news recommendation for the session-based data.
+%We propose \method which integrates prevalent and temporal preferences to provide accurate news recommendation given session-based data.
+
+We provide a brief overview of our method in Section~\ref{sec:method:overview}.
+We describe how to generate article and trendy representations in Section~\ref{sec:method:repre},
+how to rank the candidate articles in Section~\ref{sec:method:ranking}.
+Finally, we propose a noble RNN function designed for news recommendation in Section~\ref{sec:method:lstmcat} and~\ref{sec:method:mclstm}.
+
+\subsection{Overview}
+\label{sec:method:overview}
+We propose \method which is designed for balanced extraction of latent features from two different input domains.
+One of which stands for personal preferences, and the other for temporal.
+Our method reflects users’ online news watch behavior by accumulating these two preferences to provide an accurate recommendation. 
+
+To recommend news articles, we prepare candidate articles for each recommendation time. 
+Then, we rank them with order by the predicted amount of interest for each user.
+Many researchers~\cite{Yahoo2017, Naver2017, Chameleon} follow this common procedure in their news recommendation system.
+
+\method overcome the following challenges arise from the characteristic of the news article.
+
+\begin{enumerate}
+	\item \textbf{Cold-start problem:}
+Users tend to choose fresh news articles which had not been included in training data.
+How can we provide accurate news recommendation?
+	\item \textbf{Large number of small sessions:}
+When data has properties that length of a session is short and connecting sessions is hard, how can we provide accurate news recommendation?
+	\item \textbf{General solution:}
+Meta-information of news articles is unstandardized because various news sources publish them.
+How can we provide general news recommendation system?
+\end{enumerate}
+
+We adderess the aforementioned challenges by the following ideas:
+
+\begin{enumerate}
+	\item \textbf{Temporal preferences:}
+%Our proposed method, \method, considers both personal and temporal preferences of user.
+We extract temporal preferences from popular and recent articles at recommendation time.
+From temporal preferences, our method learns how to predict a user’s interest in fresh articles among candidate articles.
+	\item \textbf{Balanced extraction of latent features:}
+We design a noble RNN function to extract sufficient latent features from both input domains.
+	\item \textbf{No additional meta-information:}
+We generate a vetorized representation of article depending on its content.
+Our embedding method does not require any meta-information of article or user.
+\end{enumerate}
+
+%\begin{enumerate}
+%	\item \textbf{Cold-start problem:}
+%		How can we provide an accurate recommendation in candidate articles which include fresh articles?
+%	\item \textbf{Discriminating for the Time:}
+%		Does the model provide discriminating recommendation for the time to improve the performance?
+%	\item \textbf{Insufficient data for each user:}
+%		Does the model provide an accurate recommendation in the data where most of the users are anonymous and the length of the session is short?
+%	\item \textbf{Unstandardized meta-information:}
+%		How can we make the model be in general which is appropriate for data from different sources?
+%\end{enumerate}
+
+\method integrate prevalent and personal preferences to increase understanding of fresh articles.
+From prevalent preferences, \method provides a discriminating recommendation for the time.
+Comparing to conventional RNN-based methods which keep features of only personal preferences in the hidden state, \method keeps both prevalent and personal preferences to provide accurate recommendation even in short session.
+To make \method be suitable for various sources of data, \method uses only sentences of an article to generate representation vector.
+
+The simple way to integrate two inputs is a concatenation.
+But concatenation causes the model to be prejudiced to one input which gives a more strong clue for the result.
+We propose Multi-Cell State LSTM to prevent this prejudication to let \method extract rich latent features from two inputs from different domains.
+
+%People select the news articles as the prevalent and the personal preferences both.
+%People usually wants to know the information as their personal preferences but select the news article as the prevalent popularity if there is big-issue of today,
+%Our proposed method aggregates the prevalent and personal preferences effectively.
+%We generate the trendy vectors for each timestamp which made from popular or recent article vectors.
+%The trendy vector represents the prevalent preferences at a specific time.
+%To predict the next article in the session, we feed two inputs from the different domain to the RNN-based model which uses the LSTM cell.
+%One of the inputs is the trendy vector with the prediction timestamp.
+%The other is the news article vector with the most previous timestamp from the prediction.
+%In the \lstmcatname, we concatenate two inputs to feed the LSTM cell.
+%But we observed that the \lstmcat leans to the stronger input domain while training.
+%To overcome such a limitation of the \lstmcatname, we propose the \method which manages two internal cell states to keep a long-term memory from different input domains.
+
+\subsection{Article/Trendy Representation}
+\label{sec:method:repre}
+We prepare vector representations of article and trendy as personal and prevalent preferences, respectively.
+\paragraph{\textbf{Article Representation}}
+\method extracts personalized latent features from news watch history in the session.
+To feed selections of article to \methodname, we need to prepare vector representation of article.
+We only use sentences of article to make \method available on various news platforms which provide meta-information with different format.
+To embed articles, we use the Doc2Vec~\cite{Doc2Vec} which uses the paragraph vector method to generate vectors of words and documents considering their association of location in the documents.
+\paragraph{\textbf{Trendy Representation}}
+Trendy representation represents prevalent preferences of users at the time.
+A simple method for recommendation is that providing popular articles among users at the time. 
+We observe that this method performs well in general.
+From this observation, we conclude that popular articles include latent features of prevalent preferences for users at the time.
+People also prefer to read fresh articles because they want to get up-to-date information.
+We think that fresh articles include prevalent preferences of users because news media had decided to release an article at that time.
+This means that news media thinks that information of fresh article is important at that time.
+
+%People prefer to read fresh news articles because they want to be updated with the recent information.
+%It is hard to say that the articles represent the prevalent preferences just because they are recent, but the model needs to extract the prevalent preference from the recent articles to provide fresh information to our users.
+%In some cases, we show that the model pays attention to the recent articles to provide more accurate prediction which will be shown in the experiment section.
+
+We collect popular and recent articles to generate a trendy representation for the time.
+For each article, we count the number of watches for the previous 3 hours from each time.
+We assume that the popularity of an article is proportional to the number of watches. 
+And to get the recency of article, we record the time when the article had been shown up. 
+From these data, we pick top-5 popular and top-3 recent articles for each time.
+
+%We count the number of news articles selected by users for recent 3 hours from each timestamp.
+%We sort them with the counting number as the descending order to generate 5 most popular articles for each timestamp.
+%We also collect the earliest timestamp for each news articles which had been selected by any user to pick 3 most recent articles at the specific timestamp.
+
+We assign article representation vectors of these 8 articles to the attention layer to generate a discriminating trendy representation for the time.
+We use two inputs to the attention layer.
+One of them is the hidden state of RNN which has latent features in the session. 
+The other is the vector representation of an article to be scored.
+We decide the attention weight of each article from the output of the attention layer.
+The attention layer is constructed as follows:
+
+%To make the prevalent preferences representation, the model needs to pay different attention to trendy items depending on the circumstance of the session at the prediction timestamp.
+%To do this, we put the attention layer~\cite{Attention} which be fed with 8 article vectors as input and generate the prevalent preference vector as output.
+%This vector is assigned to the model as the second input to get feedback to adjust weights by the circumstances.
+%The attention layer is constructed as follows:
+
+\begin{align*}
+	{s_t}^{(i)} &= W_a[{\alpha_t}^{(i)}, h_{t-1}] + b_a \\
+	\tau_t &= \sum_{i}{{s_t}^{(i)}*{\alpha_t}^{(i)}}
+\end{align*}
+where the ${\alpha_t}^{(i)} \in \mathbb{R}^{n}$ is the article representation of the $i$-th element in the trendy information which is from the popular and the recent articles for each timestamp,
+the ${s_t}^{(i)} \in \mathbb{R}$ indicates the attention score of the ${\alpha_t}^{(i)}$,
+and the $\tau_t \in \mathbb{R}^{n}$ is the trendy representation of the $t$-th timestamp in the session.
+
+%\subsection{Article Representation}
+%\label{sec:method:ar}
+%We only use sentences in the article to generate a vector of representing the news article and not utilize any meta-information about the article.
+%To embed the document, we use the Doc2Vec~\cite{Doc2Vec} which uses the paragraph vector method to generate vectors for words and documents considering their relationship from the location.
+%
+%Previous researches~\cite{Yahoo2017, Naver2017, Chameleon} utilize meta-information of the article to reinforce the representation of the vector about the article.
+%The main reason for the Cold-Start problem is that the model had not been trained with the vector of a recent article in the test session.
+%By using the meta-information, we make similar representations for articles which have similar meta-information regardless of their belonging which is the train or test set.
+%Such remedy relieves the Cold-Start problem.
+%But as mentioned before, the meta-information is sparse and incomplete~\cite{Yahoo2017, Naver2017, Chameleon} in the real world data because of the property of the news ecology.
+%We use the trendy representation to resolve the Cold-Start problem instead of the meta-information.
+
+%\subsection{Trendy Representation}
+%\label{sec:method:tr}
+%We generate the trendy representation which represents the prevalent preferences of users for each specific timestamp.
+%We observed that ranking the candidate articles just by the popularity of them gives a moderate performance which means that the popular articles indwell the prevalent preferences well.
+%People prefer to read fresh news articles because they want to be updated with the recent information.
+%It is hard to say that the articles represent the prevalent preferences just because they are recent, but the model needs to extract the prevalent preference from the recent articles to provide fresh information to our users.
+%In some cases, we show that the model pays attention to the recent articles to provide more accurate prediction which will be shown in the experiment section.
+%
+%We count the number of news articles selected by users for recent 3 hours from each timestamp.
+%We sort them with the counting number as the descending order to generate 5 most popular articles for each timestamp.
+%We also collect the earliest timestamp for each news articles which had been selected by any user to pick 3 most recent articles at the specific timestamp.
+%
+%To make the prevalent preferences representation, the model needs to pay different attention to trendy items depending on the circumstance of the session at the prediction timestamp.
+%To do this, we put the attention layer~\cite{Attention} which be fed with 8 article vectors as input and generate the prevalent preference vector as output.
+%This vector is assigned to the model as the second input to get feedback to adjust weights by the circumstances.
+%
+%The attention layer is constructed as follows:
+%\begin{align*}
+%	{s_t}^{(i)} &= W_a[{\alpha_t}^{(i)}, h_{t-1}] + b_a \\
+%	\tau_t &= \sum_{i}{{s_t}^{(i)}*{\alpha_t}^{(i)}}
+%\end{align*}
+%Where the ${\alpha_t}^{(i)} \in \mathbb{R}^{n}$ is the article representation of the $i$-th element in the trendy information which is from the popular and the recent articles for each timestamp,
+%the ${s_t}^{(i)} \in \mathbb{R}$ indicates the attention score of the ${\alpha_t}^{(i)}$,
+%and the $\tau_t \in \mathbb{R}^{n}$ is the trendy representation of the $t$-th timestamp in the session.
+
+\subsection{Ranking Candidate Articles}
+\label{sec:method:ranking}
+To recommend news articles to the user, our model ranks the candidate articles as suitability with the user.
+Ideally, the candidate articles need to include all of the existing articles.
+But in practice, we need to narrow candidates to fit the capability of a new recommendation system.
+We prepare popular articles as candidates for each time because of the choice of users does not far from the others.
+In the case of candidate articles not include the next watched article in the session, we exclude most unpopular article and put the next watched article to the candidates.
+
+We feed \method with article and trendy representations to rank the candidate articles for the time.
+%We assign the linear layer after the RNN function to generate prediction vector which has the same dimension with article representation.
+%We score candidate article as the similarity with the prediction vector.
+%We have two representations to feed the model which are the trendy and the article representation to represent the prevalent and the personal preference from the different domains.
+Given a session for selections of the user, let $x_t \in \mathbb{R}^{n}$ notate the representation of the $t$-th selected article in the session.
+$\tau_t \in \mathbb{R}^{n}$ is the trendy representation of the $t$-th time in the session.
+We feed the RNN-based model with the $x_{t-1}$ and the $\tau_t$ to generate the prediction vector $\hat{y}_t \in \mathbb{R}^{n}$.
+Then we rank the candidate articles at the $t$-th time as the similarity with the $\hat{y}_t$.
+
+We generate a prediction vector as follows:
+\begin{align*}
+	h_t &= f(h_{t-1}, x_{t-1}, \tau_t;W,b) \\
+	\hat{y}_t &= W_oh_t + b_o
+\end{align*}
+where the $f$ is the RNN function in the model, and $h_t$ is the $t$-th hidden state in the session.
+We place the linear layer after RNN function to make a prediction vector which has the same dimension with article representation.
+%We place the linear layer following the RNN function to generate the prediction vector.
+
+We measure the similarity between the article representation and the prediction vector as follows:
+\begin{align*}
+	sim(\alpha, \hat{y}) &= \frac{n}{\sum_{i}^{n}{{|\alpha_{(i)}-\hat{y}_{(i)}|}^2}}
+\end{align*}
+where the $\alpha_{(i)} \in \mathbb{R}^{n}$ is the representation of articles from the candidates for the specific timestamp.
+
+\subsection{LSTM with Concatenation (\lstmcatname)}
+\label{sec:method:lstmcat}
+Concatenation is a simple way to use two inputs together.
+The RNN function with concatenating inputs is described as follows:
+%One of a simple way to feed two inputs at the same time is concatenating:
+\begin{align*}
+	h_t &= f(h_{t-1},[x_{t-1},\tau_t];W,b)
+\end{align*}
+where $f$ represents the LSTM function in the \lstmcatname.
+%$x_{t-1} \in \mathbb{R}^{n}$ notate the representation of the $(t-1)$-th selected article in the session, and $\tau_t \in \mathbb{R}^{m}$ be the trendy representation of the $t$-th timestamp, and $h_t$ is the $t$-th hidden state in the session.
+We abbreviate the concatenated vector of the $x_{t-1} \in \mathbb{R}^{n}$ and the $\tau_t \in \mathbb{R}^{n}$ to the $[x_{t-1},\tau_t] \in \mathbb{R}^{2n}$ for the convenience.
+
+%The \lstmcat leans to learning from the input domain which gives a more stronger clue for the prediction.
+We observe that \lstmcat has bias to the input domain which gives a stronger clue for prediction.
+\lstmcat focuses on the stronger input domain and extracts insufficient features from the other domain.
+As mentioned in the intuition of the dropout~\cite{Dropout}, the bias for the particular feature decreases the performance of the neural network model.
+The prevalent preferences are stronger than the personal preferences in the news recommendation ecology.
+So the \lstmcat extracts insufficient features from the personal preferences which are important to make a personalized recommendation.
+
+\subsection{Multi Cell State LSTM (\methodname)}
+\label{sec:method:mclstm}
+%In our proposed method, \methodname, we add the additional cell state to manage the long-term memory of the prevalent and the personal preferences separately.
+In our proposed method, we prevent \method being biased to one of input domain by separated cell state package including their own gate units, memory, and related weights.
+We update each cell state by the input from different domains.
+Then we update the hidden state of \method with two updated cell state.
+Two input domains share the hidden state of \methodname.
+%Each cell state has their own gate units, memory, and related weights are trained during the training phase.
+%When we feed input to the \methodname, we update the cell state using each input from the different domain, then update the hidden state which is shared regardless of the domain.
+
+%LSTM has additional cell state to store the long-term memory to make an accurate prediction.
+%This memory cell is managed by the gate units to control how much the cell state influence the next prediction and how much be learned from the new input.
+%In our proposed method, we add the new cell state in the LSTM to capture long-term memories separately and merge them to the single hidden state to accept two independent inputs at the same time.
+
+The MC-LSTM is constructed as follows:
+\begin{align*}
+	\npair{g_{f_t}} &= \sigma(\npair{W_{g_f}}[h_{t-1},\npair{x_t}]+\npair{b_{g_f}}) \\
+	\npair{g_{i_t}} &= \sigma(\npair{W_{g_i}}[h_{t-1},\npair{x_t}]+\npair{b_{g_i}}) \\
+	\npair{g_{o_t}} &= \npair{W_{g_o}}[h_{t-1},\npair{x_t}]+\npair{b_{g_o}} \\
+	\npair{\tilde{c}_t} &= \tanh(\npair{W_c}[h_{t-1},\npair{x_t}]+\npair{b_c}) \\
+	\npair{c_t} &= \npair{g_{f_t}} * \npair{c_{t-1}} + \npair{g_{i_t}} * \npair{\tilde{c}_t} \\
+	h_t &= \frac{\sum_{n}{e^{\npair{g_{o_t}}}*\tanh(\npair{c_t})}}{\sum_{n}{e^{\npair{g_{o_t}}}}}
+\end{align*}
+where the $n \in \{prevalent,\space personal\}$ indicates the input domain where the cell states belong at.
+The domain of prevalent accepts trendy representation as input.
+And the domain of personal accepts article representation. 
+Different from the LSTM, we remove the sigmoid function in the output gate function.
+We aggregate cell states from each domain by the sum of the exponential of them to update hidden state.
+%Where the number $n \in \{1, 2\}$ indicates the input domain where the cell states belong at.
+%We let the domain number 1 represents the personal preferences and the number 2 represents the prevalent.
+%We remove the sigmoid function in the output gate function to aggregate cell states from each domain using the sum of the exponential of them.
+%It shares the hidden state regardless of the input domain and updates it using aggregated cell state.
+
+\begin{figure}[h]
+\begin{center}
+\begin{tabular}{cc}
+     \includegraphics[width=0.47\textwidth]{FIG/MC_LSTM.png} \\
+\end{tabular}
+\caption{An illustration of the \method implementation.
+	The \method manages two independent cell states to manage two inputs from the different domains.
+	Each cell state is updated as regard to their own gate units when being fed with inputs.
+	After then, the \method aggregates the updated cell states to update the hidden state.
+}
+\label{fig:mclstm}
+\end{center}
+\end{figure}
+
+To prevent the aforementioned bias to prevalent preferences, we randomly dropout~\cite{Dropout} the entire cell state of the prevalent domain in the training phase.
+This is one kind of group dropout~\cite{GroupDropout} which dropout all of the related nodes with the input domain.
+%To prevent the \method leaning to the prevalent preferences, we dropout the entire cell state~\cite{Dropout, GroupDropout} of the prevalent randomly when updating the hidden state.
+In this case, the hidden state is updated as follows:
+\begin{align*}
+	h_t &= \sigma(\onepair{g_{o_t}})*\tanh(\onepair{\tilde{c}_t})
+\end{align*}
+Where the $\sigma$ is the sigmoid function which had been removed in the output gate of \methodname, the $\onepair{g_{o_t}}$ indicates the value of the output gate for the personal preferences domain after updating $t$-th input in the session and the $\onepair{\tilde{c}_t}$ is the cell state after updating $t$-th.
+By this method, \method extracts sufficient features from input domain of personal in the tranining phase.
+Which improves the accuracy of news recommendation.
+%We dropout the cell state of the prevalent domain only in the training phase to let the \method try to learn from the input domain of the personal preferences without the prevalent.
+%This improves the accuracy of the recommendation at the test phase.
+
