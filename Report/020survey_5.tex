@@ -1,2 +1,12 @@
 \subsection{Double Q-learning}
-...
+Hado van Hasselt, et. al.는 Double Q-learning을 deep reinforcement learning에 적용한 후 여러가지 게임을 대상으로 테스트하여 성능을 향상시킴을 보였다~\cite{DoubleQ}.
+기존의 Q-learning에서는 max 함수를 사용하여 action을 선택하고 평가하는데 같은 value값들을 사용하기 때문에 value값 추측이 과평가되고 있다.
+이를 해소하기 위해 Double Q-learning에서는 action의 선택과 평가를 분리하여 각자 서로 다른 weight set을 가지고 동작하게 한다.
+이 차이를 수식으로 알아보면 아래와 같다.
+\begin{align*}
+	Y^Q_t &= R_{t+1} + \gamma Q ( S_{t+1}, \underset{a}{argmax}Q(S_{t+1},a;\theta_t);\theta_t ) \\
+	Y^{DoubleQ}_t &= R_{t+1} + \gamma Q ( S_{t+1}, \underset{a}{argmax}Q(S_{t+1},a;\theta_t);\theta^{'}_t ) \\
+\end{align*}
+여기서 중요한 점은 두 개의 weight set, $\theta_t$와 $\theta^{'}_t$, 으로 action의 선택과 평가에서 사용되는 weight들을 별도로 사용한다는 것이다.
+각각의 weight set은 선택과 평가 중 한가지 용도로만 사용되는 것은 아니고 일정 주기로 서로의 역할을 교대한다.
+이 방법을 사용하면 value값 추측을 과평가하지 않고 오히려 저평가하게 된다.
