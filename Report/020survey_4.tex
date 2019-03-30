@@ -1,4 +1,5 @@
 \subsection{Asynchronous Actor-Critic}
+\label{sec:survey:A3C}
 Volodymyr Mnih, et. al. 이 제안한 Asynchronous Actor-Critic (A3C)~\cite{A3C}는 게임 플레이를 위한 강화학습에 널리 쓰이는 방법이다.
 A3C에서 Asynchronous는 여러 agent가 각자의 environment에서 활동하며 비동기적으로 global network를 업데이트해 나가는 것을 의미한다.
 앞서 DQN이나 DDPG에서 학습에 활용되는 샘플 데이터의 상관관계를 줄이기 위해 Replay Memory를 사용하였던 것을 대체하는 것으로 독립된 여러 agent가 서로 다른 environment에서 샘플을 추출하므로 각각의 업데이트에 활용되는 데이터의 상관관계는 낮다.
