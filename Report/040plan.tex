@@ -1,8 +1,72 @@
-...
-\subsection{OpenAI gym}
-...
 
-\subsection{Training}
-스테이지별 학습도 가능
-...
+본 절에서는 개발 환경과 일정에 대한 부분을 다룬다.
+하위 섹션~\ref{sec:dev:gym}에서는 개발 환경 구성에 핵심이 되는 gym 라이브러리를 소개한다.
+그리고 프로젝트 구성원 각자 개발 일정에 따른 역활을 하위 섹션~\ref{sec:dev:schedule}에서 정한다.
+
+\subsection{OpenAI gym}
+\label{sec:dev:gym}
+게임을 학습하기 위해서는 입력을 통해 게임을 컨트롤하고 필요에 따라 게임을 재시작하거나 환경에 관련된 값을 얻어올 수 있는 개발환경이 필요하다.
+슈퍼 마리오 브라더스의 경우 다양한 NES 에뮬레이터로 PC환경에서 게임을 실행시킬 수 있다.
+OpenAI에서는 다양한 게임에 대해 강화학습을 적용할 수 있도록 gym 라이브러리를 제공하였는데, 슈퍼 마리오 브라더스의 에뮬레이터 환경과 gym 라이브러리를 연동한 것이 바로 gym-super-mario-bors~\cite{GYMMario} 이다.
+이를 활용하면 게임 화면 이외의 게임내의 추가 정보를 메모리 영역으로부터 읽어와서 Table~\ref{tab:mario:info}와 같은 정보를 매 상황마다 얻어올 수 있다.
+
+\begin{table}[h]
+	\caption {
+		게임 화면외 얻을 수 있는 추가 정보. 매 action을 입력할 때 마다 다음 화면 정보와 함께 얻어올 수 있다.
+	}
+	\label{tab:mario:info}
+\begin{tabular}{ll}
+\toprule
+추가 정보      & \multicolumn{1}{c}{설명} \\
+\midrule
+Distance       & 출발점에서부터의 거리 \\
+Life           & 마리오의 잔여 생명 \\
+Score          & 현재 점수 \\
+Coins          & 현재까지 획득한 코인의 수 \\
+Time           & stage를 완료해야하는 제한 시간 \\
+Player status  & 마리오의 변신 정도 \\
+Ignore         & 마리오가 갇혀있는 상태 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+우리는 python 기반의 NES 에뮬레이터와 gym 환경을 사용하므로 python이 구동가능한 환경이면 우리 모델을 학습시킬 수 있다.
+우리 모델을 학습시킬 때 GPU 가속을 통해 연산 효율을 최적화 하기 위해서 CUDA 환경이 설치된 ubuntu 16.04 에서 모델을 학습시키도록 하였다.
+특히 학습시에는 게임을 렌더링하지 않도록 하여 최대한 빠른 시간에 많은 에피소드를 학습할 수 있도록 한다.
+
+\subsection{개발 일정}
+\label{sec:dev:schedule}
+본 프로젝트는 두 사람이 협동하여 4, 5월간 9주에 걸쳐서 수행한다.
+프로젝트 전반부에는 작업의 효율을 위해 개발환경 세팅 및 기존 방법을 구현할 사람과 새로운 방법을 연구할 사람으로 나누어 분업한다.
+Table~\ref{tab:schedule}은 프로젝트 구성원이 각 역활을 수행할 일정을 나타낸다.
+5주차까지 개발환경 세팅과 기존 방법으로 학습해보는 것까지 완료한 후 서로 공유하여 각자 개발환경을 갖출 수 있도록 한다.
+이 후 새로운 방법을 연구한 것을 공유하여 제안 메소드를 협업하여 구현한 후 학습시킨다.
+
+% Please add the following required packages to your document preamble:
+% \usepackage{multirow}
+\begin{table}[]
+	\caption {
+		개발 일정.
+		크게 개발환경 설정 및 기존 방법으로 게임을 학습하는 담당과 새로운 방법을 연구 하는 담당으로 나뉜다.
+		이후 개발환경을 공유한 뒤, 새로운 방법 개발에 협력한다.
+	}
+	\label{tab:schedule}
+\begin{tabular}{clccccccccc}
+\toprule
+                     & \multicolumn{1}{c}{} & \multicolumn{4}{c}{4월} & \multicolumn{5}{c}{5월} \\
+                     & \multicolumn{1}{c}{} & 1    & 2   & 3   & 4   & 1  & 2  & 3  & 4  & 5  \\
+\midrule
+\multirow{3}{*}{구본헌} & 개발환경 세팅              & *    & *   & *   &     &    &    &    &    &    \\
+                     & 기존 방법으로 학습           &      &     & *   & *   & *  &    &    &    &    \\
+                     & 제안 방법 개발             &      &     &     &     &    & *  & *  & *  & *  \\
+\midrule
+\multirow{3}{*}{김정훈} & 개발환경 세팅              &      &     & *   &     &    &    &    &    &    \\
+                     & 새로운 방법 연구           & *    & *   & *   & *   & *  &    &    &    &    \\
+                     & 제안 방법 개발             &      &     &     &     &    & *  & *  & *  & * \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+신경학습망을 통한 모델의 특성상, 하이퍼 파라미터의 세팅에 따라 성능의 변화가 클 가능성이 높다.
+프로젝트 구성원은 각자 가지고 있는 컴퓨팅 환경을 최대한 활용하여 하이퍼 파라미터 세팅을 분배하여 각자 학습하며, 주기적으로 서로의 결과물을 비교하여 더 나은 세팅을 찾도록 한다.
 
