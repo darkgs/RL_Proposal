@@ -1,2 +1,26 @@
-\subsection{Survey3}
-....
+\subsection{Deep Deterministic Policy Gradient}
+Deep Deterministic Policy Gradient (DDPG)는 state와 action을 입력으로 받아 각 action에 대한 value값을 산출해내는 Q-function을 학습시키는 방법이다.
+DDPG의 핵심 동작은 아래와 같은 식으로 나타낼 수 있다.
+\begin{align*}
+	a^*(s) &= arg \underset{a}{max} Q^*(s,a) \\
+\end{align*}
+%\begin{align*}
+%	h_t &= f(h_{t-1},x_t;W,b) \\
+%		&= \tanh{(W_{hh}h_{t-1}+W_{hx}x_t+b_h)} \\
+%		&= \tanh{(W_{h}[h_{t-1},x_t]+b_h)}
+%\end{align*}
+여기서 Q-function Q 는 action a와 state s를 입력으로 받아 value를 판별해주므로 최대 value를 가지는 action을 선택하면 최적화된 policy를 구할 수 있다.
+
+DDPG는 다음과 같은 특징을 가지고 있다.
+\begin{itemize}
+	\item off-policy 방법
+	\item continuous action space에서만 동작하는 방법
+	\item 병렬화된 학습 방법을 제공하지 않음
+\end{itemize}
+본 프로젝트에서 학습하기로 한 게임인 슈퍼 마리오 브라더스는 discrete한 action space를 가지므로 DDPG 알고리즘을 바로 적용할 수는 없다.
+하지만 DDPG에서 학습을 돕기 위한 주요 아이디어를 차용하여 우리 프로젝트에 적용해 볼 수 있다.
+
+\paragraph{\textbf{Replay Buffer:}}
+음냐
+\paragraph{\textbf{Target Network:}}
+음냐
