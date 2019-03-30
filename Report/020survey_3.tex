@@ -21,13 +21,12 @@ DDPG는 다음과 같은 특징을 가지고 있다.
 하지만 DDPG에서 학습을 돕기 위한 주요 아이디어를 얻어와 우리 모델을 설계하는 데 활용할 수 있다.
 
 \paragraph{\textbf{Replay Buffer:}}
-DQN 에서 소개된 Replay Buffer 방식을 계승한다.
+DQN에서 소개된 바 있는 Replay Buffer를 DDPG 방법에서도 사용한다.
+Replay Buffer의 핵심 아이디어는 학습에 사용되는 샘플들의 상관관계를 줄여서 overfitting을 막는 것이다.
+한 에피소드의 인접한 타임라인에서 채취된 샘플들은 밀접한 상관관계를 가진다.
+Replay Buffer로 과거 경혐을 저장하고 랜덤으로 샘플을 추출하여 학습에 활용하면 이러한 상관관계를 줄이는 효과가 있다.
 DDPG 는 off-policy 를 위한 방법이므로 Replay Buffer의 크기가 DQN에 비해 커질 수 있다.
 GPU를 통한 병렬처리를 통해 하드웨어의 성능을 최대로 활용하기 위해서 DDPG는 Replay Buffer에서 채취한 샘플들을 minibatch 형태로 학습한다.
-%한 에피소드의 인접한 타임라인에서 채취된 샘플들은 밀접한 상관관계를 가진다.
-%이것은 학습되는 Q-function이 해당 타임라인에 대해 overfitting되게 한다.
-%Replay Buffer로 과거 경혐을 저장하고 랜덤으로 샘플을 추출하여 학습에 활용하면 이러한 상관관계를 줄이는 효과가 있다.
-%하지만 Replay Buffer의 크기를 너무 크게 하면 학습에 걸리는 시간이 크게 늘어나게 된다.
 \paragraph{\textbf{Soft Updating Target Network:}}
 Target Network를 이용한 weight 업데이트 방식은 DQN에서 소개한 아이디어와 같다.
 하지만 Actor-Critic에 맞추어 weight를 바로 업데이트하지 않고 일정 비율로 업데이트될 값을 아래와 같이 절감한다.
