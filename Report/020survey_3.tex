@@ -1,5 +1,5 @@
 \subsection{Deep Deterministic Policy Gradient}
-Deep Deterministic Policy Gradient (DDPG)는 state와 action을 입력으로 받아 각 action에 대한 value값을 산출해내는 Q-function을 학습시키는 방법이다.
+Timothy P, et. al. 이 제안한 Deep Deterministic Policy Gradient (DDPG)~\cite{DDPG}는 state와 action을 입력으로 받아 각 action에 대한 value값을 산출해내는 Q-function을 학습시키는 방법이다.
 DDPG의 핵심 동작은 아래와 같은 식으로 나타낼 수 있다.
 \begin{align*}
 	a^*(s) &= arg \underset{a}{max} Q^*(s,a) \\
@@ -18,9 +18,23 @@ DDPG는 다음과 같은 특징을 가지고 있다.
 	\item 병렬화된 학습 방법을 제공하지 않음
 \end{itemize}
 본 프로젝트에서 학습하기로 한 게임인 슈퍼 마리오 브라더스는 discrete한 action space를 가지므로 DDPG 알고리즘을 바로 적용할 수는 없다.
-하지만 DDPG에서 학습을 돕기 위한 주요 아이디어를 차용하여 우리 프로젝트에 적용해 볼 수 있다.
+하지만 DDPG에서 학습을 돕기 위한 주요 아이디어를 얻어와 우리 모델을 설계하는 데 활용할 수 있다.
 
 \paragraph{\textbf{Replay Buffer:}}
-음냐
-\paragraph{\textbf{Target Network:}}
-음냐
+DQN 에서 소개된 Replay Buffer 방식을 계승한다.
+DDPG 는 off-policy 를 위한 방법이므로 Replay Buffer의 크기가 DQN에 비해 커질 수 있다.
+GPU를 통한 병렬처리를 통해 하드웨어의 성능을 최대로 활용하기 위해서 DDPG는 Replay Buffer에서 채취한 샘플들을 minibatch 형태로 학습한다.
+%한 에피소드의 인접한 타임라인에서 채취된 샘플들은 밀접한 상관관계를 가진다.
+%이것은 학습되는 Q-function이 해당 타임라인에 대해 overfitting되게 한다.
+%Replay Buffer로 과거 경혐을 저장하고 랜덤으로 샘플을 추출하여 학습에 활용하면 이러한 상관관계를 줄이는 효과가 있다.
+%하지만 Replay Buffer의 크기를 너무 크게 하면 학습에 걸리는 시간이 크게 늘어나게 된다.
+\paragraph{\textbf{Soft Updating Target Network:}}
+Target Network를 이용한 weight 업데이트 방식은 DQN에서 소개한 아이디어와 같다.
+하지만 Actor-Critic에 맞추어 weight를 바로 업데이트하지 않고 일정 비율로 업데이트될 값을 아래와 같이 절감한다.
+\begin{align*}
+	\theta^{'} \leftarrow \tau\theta + (1 - \tau)\theta^{'}
+\end{align*}
+여기서 $\tau << 1$ 이다.
+이는 Target value의 값이 천천히 변화하도록 제한하는 것으로 학습이 안정되는 것을 도와준다.
+하지만 전반적인 학습 속도를 늦추는 경향이 있다.
+
