@@ -1,4 +1,43 @@
 
+\subsection{Evaluation}
+\label{sec:exp:evaluation}
+Table~\ref{tab:evaluation}에서 보이는 바와 같이 \sdqnname를 사용한 모델에서 마리오가 가장 먼 거리를 이동하였다.
+우리의 학습 목표가 빠른 시간내에 스테이지를 감안하면 모델의 성능 평가에 시간적인 요소가 들어가야 한다.
+하지만 스테이지를 클리어하지 못한 상황에서는 시간이 많이 걸리더라도 먼 거리를 이동하는 것이 바람직하다.
+아쉽게도 본 실험에 사용한 모델들 (\dqnname, \sdqnname, \sadqnname) 모두 월드 1-1을 클리어하는 데까지 학습되지 못하였다.
+본 실험 시간이 충분하지 못하여 각 모델들은 동일하게 10시간 동안의 학습시키고, 학습하는 중간에 마리오의 생명을 모두 소진한 경우 테스트 모드로 변환하여 마리오의 이동거리를 측정하였다.
+테스트 모드에서는 학습때와는 달리 e-greedy 방법을 사용하지 않고 모델의 q-network을 사용하여 매 action을 기대되는 q값을 최대화 하도록 선택하였다.
+이와 같은 실험에서 화면 분활을 통해 특정 부분에 대해 집중적으로 feature를 수집하는 \sdqnname이 마리오를 가장 먼거리로 이동시켰다.
+
+\begin{table}[h]
+\centering
+\caption {
+	모델별 마리오 도달거리. 월드 1-1에서만 테스트하였으며 많은 거리를 이동할 수록 숫자가 크다.
+}
+\label{tab:evaluation}
+\begin{tabular}{llll}
+\toprule
+     & \dqnname  & \sdqnname & \sadqnname \\
+\midrule
+도달거리 & 1641 & 1784  & 1668  \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+우리의 기대와는 달리, \sdqnname에서 attention network를 추가한 \sadqnname의 성능이 낮게 평가되었다.
+이는 충분한 학습시간을 가지지 못한 우리의 상황이 학습하여야하는 파라미터의 수가 많은 \sadqnname에게 불리한 요소로 작용되었을 것으로 추측된다.
+
+
+\subsection{Effectiveness of Dropout and Batch Normalization}
+\label{sec:exp:dropout}
+일반적인 neural network에서 dropout과 batch normalization은 모델의 overfitting을 막기위해 널리 사용되는 방법이다.
+DQN기반의 모델들도 q-value function을 neural network에 기반한 함수를 사용하고 있으므로 해당 기법들이 모델의 학습에 도움이 될 것이라고 생각하였다.
+\sapdqnname은 \sadqnname에서 각 CNN의 앞단에 batch normalization layer를 추가하고, action의 q값을 추론하기 직전의 MLP (Multi Layer Perceptron) 직후 30\%의 노드를 dropout시키는 dropout layer를 추가하였다.
+결과적으로 \sapdqnname은 학습되는 데 실패하여 마리오의 이동거리가 40을 채 넘지 못하였다.
+
+
+\subsection{Reward}
+\label{sec:exp:reward}
 % 이건 그냥 써본건데 혹시라도 각각의 리워드 세팅에 따라 실험한게 있다면 결과를 쓰기 위해 놔둬봤어영
 첫 번째로는 마리오가 과거 위치보다 좌측으로 10만큼 이동하였다면 이는 목적지에서 더욱 멀어지는 방향으로 가고 있다 판단되어 -5만큼의 reward를 제공한다. 
 만약 마리오가 과거 위치보다 우측으로 10만큼을 이동한다면 이는 목적지와 더 가까워지고 있다는 의미로 +5만큼의 reward를 제공한다. 
