@@ -1,5 +1,6 @@
 %\documentclass[sigconf, review, anonymous, screen]{acmart}
-\documentclass[sigconf, screen]{acmart}
+\documentclass[10pt]{article}
+\usepackage[top=3cm, bottom=3cm, left=3cm, right=3cm]{geometry}
 % The preceding line is only needed to identify funding in the first footnote. If that is unneeded, please comment it out.
 \usepackage{kotex}
 \usepackage{amsmath,amssymb,amsfonts}
@@ -31,42 +32,29 @@
 \usepackage{balance}
 \xspaceaddexceptions{]\}}
 
-\setcopyright{none}
-\renewcommand\footnotetextcopyrightpermission[1]{}
-\settopmatter{printacmref=false}
-
-
-%\acmConference[KDD'19]{ACM SIGKDD Conference}{Aug 2019}{Anchorage, Alaska USA}
-\acmConference[대규모 데이터분석 특강]{}{APR 2019}{SNUCSE}
-\acmYear{2019}
-\copyrightyear{2019}
 
 % Definitions
-\input{./dfn}
+%\input{./dfn}
 %\setlength{\belowcaptionskip}{-0.3cm}
-
 \begin{document}
-\title[Super Mario RL]{대규모 데이터분석 특강 - 프로젝트 제안서}
+\title{[Super Mario RL] 대규모 데이터분석 특강 - 프로젝트 보고서}
 
-\author{구본헌}
-\affiliation{
-  \institution{컴퓨터공학부}
-  \institution{서울대학교}
+\author{
+구본헌 \& 김정훈\\
+Department of Computer Science and Engineering\\
+Seoul National University\\
+\texttt{\{darkgs, rlawjdgns434\}@snu.ac.kr}\\
+\texttt{2019-\{36050,29394\}}\\
 }
-\email{darkgs@snu.ac.kr}
 
-\author{김정훈}
-\affiliation{
-  \institution{컴퓨터공학부}
-  \institution{서울대학교}
-}
-\email{rlawjdgns434@snu.ac.kr}
+\renewcommand{\baselinestretch}{1.25}
 
+\maketitle
 % Sec 0. Abstract
 \begin{abstract}
-본 제안서는 2019년도 봄학기 대규모 데이터분석 특강 과목의 조별 프로젝트의 내용을 담고 있다.
+본 프로젝트 보고서는 2019년도 봄학기 대규모 데이터분석 특강 과목의 조별 프로젝트의 내용을 담고 있다.
 우리는 슈퍼 마리오 브라더스 게임을 강화학습을 통해 높은 점수로 플레이하는 모델을 개발하는 것을 목표로 한다.
-이를 위해 우리는 먼저 게임 플레이를 대상으로하는 강화학습 기법들에 대해 발표된 논문을 조사하여, 우리 모델을 구성할 때 고려할 점과 아이디어를 얻기위한 기반으로 삼는다.
+이를 위해 우리는 먼저 게임 플레이를 대상으로 하는 강화학습 기법들에 대해 발표된 논문을 조사하여, 우리 모델을 구성할 때 고려할 점과 아이디어를 얻기위한 기반으로 삼았다.
 또한, 슈퍼 마리오 브라더스 게임을 분석하여 강화학습 모델에 어떻게 적용할지 알아보고 구체적인 개발환경을 조사한 후 일정을 수립하였다.
 \end{abstract}
 
@@ -74,7 +62,7 @@
 %Reinforcement Learning; 강화 학습
 %}
 
-\maketitle
+
 % Sec 1. Introduction
 \section{Introduction}
 \label{sec:intro}
@@ -95,17 +83,25 @@ GPU 가속을 통한 병렬처리 컴퓨팅 환경을 효율적으로 이용하�
 \input{./020survey_4}
 \input{./020survey_5}
 
+\section{Preliminaries}
+\label{sec:preliminaries}
+\input{./030preliminaries}
+
 \section{Proposed Method}
 \label{sec:method}
-\input{./030proposed}
+\input{./040proposed}
 
-\section{Development Plan}
+\section{Development Settings and Plan}
 \label{sec:plan}
-\input{./040plan}
+\input{./050plan}
+
+\section{Experiments}
+\label{sec:experiments}
+\input{./060experiments}
 
 \section{Conclusion}
 \label{sec:conclusion}
-\input{./060conclusion}
+\input{./070conclusion}
 
 %\newpage
 %\balance
