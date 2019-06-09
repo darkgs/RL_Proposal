@@ -13,25 +13,41 @@
 Convolutaionl neural network (CNN)~\cite{CNN}은 이미지로 부터 학습 모델에 필요한 feature를 추출하여 의사 결정에 활용하는 널리 알려진 방법이다.
 본 프로젝트에서 우리는 화면 이미지를 CNN을 통해 해석하여 게임 점수를 최대한 얻을 수 있는 action을 추론하는 모델을 만들고자 한다.
 
-우리는 키 조합을 통해 action을 생성할 수 있는데 유의미한 조합만을 고려하면 아래와 같은 16개의 키조합을 각각의 action으로 정의한다.
-\begin{enumerate}
-	\item 아무키도 누르지 않음
-	\item left
-	\item right
-	\item up
-	\item down
-	\item A
-	\item B
-	\item A + B
-	\item left + A
-	\item left + B
-	\item left + A + B
-	\item right + B
-	\item right + A
-	\item right + A + B
-	\item up + B
-	\item down + B
-\end{enumerate}
+우리는 키 조합을 통해 action을 생성할 수 있는데 유의미한 조합만을 고려하면 Table~\ref{tab:mario:action}과 같은 16개의 action을 정의할 수 있다.
+여기서 유의미한 조합이라 함은, 무의미한 조합을 제외한 키 조합을 의미한다.
+슈퍼 마리오는 총 6개의 키를 가지고 있으므로 총 64개의 키 조합을 가지는 데, 이 중 left + right와 같이 서로 상반되는 동작을 동시에 지정하는 경우에는 게임 내부의 키 매핑에 의해 아무 행동을 하지 않게 된다.
+이러한 무의미한 action의 경우 우리의 학습 모델에 혼동만 주기 때문에 미리 제외하였다.
+%
+\begin{table}[h]
+	\caption {
+		슈퍼 마리오 브라더스에서 가능한 키 입력 조합. 가능한 조합 중 유의미한 키 조합만을 선별하였다.
+	}
+	\label{tab:mario:action}
+\centering	
+\begin{tabular}{lcccccc}
+\toprule
+          & Left & Right & Up & Down & A & B \\
+\midrule
+Action 1  &      &       &    &      &   &   \\
+Action 2  & *    &       &    &      &   &   \\
+Action 3  &      & *     &    &      &   &   \\
+Action 4  &      &       & *  &      &   &   \\
+Action 5  &      &       &    & *    &   &   \\
+Action 6  &      &       &    &      & * &   \\
+Action 7  &      &       &    &      &   & * \\
+Action 8  &      &       &    &      & * & * \\
+Action 9  & *    &       &    &      & * &   \\
+Action 10 & *    &       &    &      &   & * \\
+Action 11 & *    &       &    &      & * & * \\
+Action 12 &      & *     &    &      & * &   \\
+Action 13 &      & *     &    &      &   & * \\
+Action 14 &      & *     &    &      & * & * \\
+Action 15 &      &       & *  &      &   & * \\
+Action 16 &      &       &    & *    &   & * \\
+\bottomrule
+\end{tabular}
+\end{table}
+%
 우리의 모델은 최종적으로 Figure~\ref{fig:overview}와 같이 현재 state에서 각 차원이 각 action에 대응되는 16차원의 vector를 산출하여 각 action의 적합성을 확률적으로 추론한다.
 \begin{figure}[]
 \begin{center}
