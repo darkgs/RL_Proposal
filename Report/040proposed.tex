@@ -52,7 +52,7 @@ Action 16 &      &       &    & *    &   & * \\
 \begin{figure}[]
 \begin{center}
 \begin{tabular}{c}
-     \includegraphics[width=0.4\textwidth]{FIG/overview.pdf} \\
+     \includegraphics[width=0.7\textwidth]{FIG/overview.pdf} \\
 \end{tabular}
 \caption{
 	게임 화면으로부터 action을 추론하기 위한 모델. CNN을 통해 게임화면을 해석하여 16차원의 action의 적합성을 추론한다.
@@ -94,19 +94,24 @@ Reward를 제공하는 방식은 다음과 같다.
 
 \subsection{DQN}
 \label{sec:method:dqn}
-DQN 설명
+우리가 이번 프로젝트에서 개발한 메소드는 앞서 \ref{sec:survey:DQN}에서 설명한 DQN방식을 기본으로 하여 일부 구조를 개선해보는 식으로 개발되었다.
+DQN은 강화학습에서 q-value function을 deep neural network로 대체한 방법의 일종으로써 화면의 픽셀 정보에서 CNN으로 feature를 추출하여 state를 구성한다.
+또한 모델이 잘 학습되게 하기위해서 replay memory와 target q-network방식을 사용하고 있다.
+
+Replay memory는 agent의 경험을 최신 순으로 저장하고 이를 batch 단위로 학습에 활용한다.
+본 프로젝트에 사용된 모델에서는 간단한 parameter search를 통해 replay memory의 용량은 최근 50,000개를 저장하도록 하였으며 매 step시 여기서 임의로 16개를 추출하여 모델을 학습시키는 데 사용하였다.
+이를 통해 q-network가 학습됨에 따라 모델이 특정 에피소드로 편향된 학습을 방지할 수 있다.
+
+Target q-network는 agent가 행동을 수행할 때의 q-network와 학습의 target이 되는, 다음 state의 q값을 구하는, q-network의 parameter값들을 별개로 관리하면서 모델의 학습을 돕는 기법이다.
+본 프로젝트에서도 이 기법을 활용하여 모델이 더욱 잘 학습될 수 있도록 하였다.
 
 \subsection{Split DQN (\sdqnname)}
 \label{sec:method:sdqn}
-S-DQN 설명
-
-\subsection{Split Attention DQN (\sadqnname)}
-\label{sec:method:idea}
 사람들이 슈퍼 마리오 브라더스를 실제로 플레이할 때, 사람들은 상황에 따라 화면의 일부분을 좀 더 집중해서 바라보게 된다.
 예를 들면, 마리오가 공중에서 하강하고 있을 때는 마리오의 아래 쪽에 집중하여 바닥의 함정을 피하거나 적을 밟아 처치하도록 조작한다.
 전반적으로, 전체 화면의 내용보다 마리오 주변에서 일어나고 있는 일에 집중하는 경향이 있다.
-
-\begin{figure}[]
+%
+\begin{figure}[h]
 \begin{center}
 \begin{tabular}{c}
      \includegraphics[width=0.4\textwidth]{FIG/split_screen.pdf} \\
@@ -117,7 +122,7 @@ S-DQN 설명
 \label{fig:split_screen}
 \end{center}
 \end{figure}
-
+%
 이러한 게임의 특성을 고려하여 우리 모델도 여러 개의 CNN을 만들어 화면의 각 구역별로 따로 feature를 추출하기로 한다.
 이렇게 추출한 feature의 중요도는 마리오의 상황에 따라 변화한다. 앞서 예와 같이 마리오가 공중에 있다면 마리오 주변에 좀 더 집중해야 한다.
 만약 마리오의 달리기 속도가 빠른 상황이라면 좀 더 전체 화면부위를 고려하여 다음 action을 정해야한다.
@@ -135,13 +140,16 @@ Split DQN을 처리하는 과정은 Figure \ref{fig:split_dqn}와 같다.
 여기서 다른 부분은 바로 채널의 크기인데, 전체 화면을 처리하는 빨간색 영역에 대해서는 최종적으로 48개의 채널을 가진다.
 이와 다르게 나머지 파란색 구역과 노란색 구역에 대한 처리는 최종적으로 각각 24개의 채널을 가진다. 
 이렇게 총 세 개의 결과물을 합치는 과정을 거치는데 이때 Concatenate 연산을 통해 최종적으로 8X8X96 크기를 가진 매트릭스를 출력한다. 
-이러한 결과를 Softmax 연산을 통해 총 16개의 액션을 의미하는 벡터를 출력한 뒤 가장 값이 높은 action을 선택한다. 
+이렇게 생성된 feature map을 multi layer perceptron (MLP)를 통과시켜 action의 수와 같은 16차원의 vector를 생성한 후, softmax를 통해 각 action별의 기대값을 산출한다.
 
-% 검토 필요합니답
-Split Attention DQN은 여기에 각각의 채널에 대해 weight sum을 하여 어느 곳에 더 큰 비중을 줄지를 결정해 더 나은 결정을 할 수 있도록 유도한다. 
-
-
-\begin{figure}[]
+\subsection{Split Attention DQN (\sadqnname)}
+\label{sec:method:idea}
+앞서 설명한 \sdqnname에서 CNN으로부터 추출된 feature는 각각 8x8의 크기를 가지며 96개 존재하였다.
+\sdqnname에서는 이를 MLP로 연결하여 각 action에 대한 q값을 계산하였다.
+이는 학습해야하는 weight의 수가 많아 학습에 어려움을 겪게 된다.
+%이러한 결과를 Softmax 연산을 통해 총 16개의 액션을 의미하는 벡터를 출력한 뒤 가장 값이 높은 action을 선택한다. 
+%
+\begin{figure}[ht]
 \begin{center}
 \begin{tabular}{c}
      \includegraphics[width=0.8\textwidth]{FIG/split_dqn.png} \\
@@ -152,4 +160,18 @@ Split Attention DQN은 여기에 각각의 채널에 대해 weight sum을 하여
 \label{fig:split_dqn}
 \end{center}
 \end{figure}
+% 검토 필요합니답
+%Split Attention DQN은 여기에 각각의 채널에 대해 weight sum을 하여 어느 곳에 더 큰 비중을 줄지를 결정해 더 나은 결정을 할 수 있도록 유도한다. 
+\sadqnname은 이런 feature들의 통합을 attention network를 통해 수행함으로써 모델이 상황에 따라 유연하게 feature를 선택적으로 집중할 수 있도록 하며, MLP에 비해 적은 수의 weight를 가지므로 학습에도 좀 더 용이한 구조를 가진다.
+우리가 구성한 attention network는 전체적인 상황, context,를 통해 각각 feature의 비중을 구하게 되는데, 기존의 attention이 recurrent neural network의 hidden state를 주로 context를 사용하였지만 우리의 구조에서 그것을 대처할 만한 것을 찾기 힘들다.
+차선으로 전체적인 상황을 보고 있는 CNN에서 추출된 8x8x48의 feature들의 평균값을 구하여 그것을 context로 활용하였다.
+이것과 각각의 feature들을 64차원의 벡터로 변환하여 concatnate시켜 attention network의 입력으로 활용하였고 각각의 비중치의 scalar값을 구하도록 하였다.
+각각의 비중치들을 48+24+24차원의 벡터로 통합되어 softmax를 통해 총합이 1이 되는 각각의 feature의 가중치를 구한다.
+
+
+
+
+
+
+
 

@@ -1,4 +1,9 @@
 
+본 절에서는 우리가 구현한 모델들을 학습시키면서 관찰한 내용들을 정리하고 있다.
+\ref{sec:exp:evaluation}에서 실험한 사용한 모델들 (\dqnname, \sdqnname, \sadqnname)의 성능은 play mode에서 마리오의 도달거리를 통해 측정하였다.
+다음으로 \ref{sec:exp:dropout}에서 neural network에서 모델의 overfitting을 막고 학습을 돕기 위해 자주 쓰이는 방법인 dropout과 batch normalization이 미치는 영향에 대해서 알아보았다.
+마지막으로 \ref{sec:exp:reward}에서 강화학습에서 학습에 중요한 영향을 미치는 reward에 대해 다양한 세팅을 소개하고 그에 대한 성능 변화를 소개하였다.
+
 \subsection{Evaluation}
 \label{sec:exp:evaluation}
 Table~\ref{tab:evaluation}에서 보이는 바와 같이 \sdqnname를 사용한 모델에서 마리오가 가장 먼 거리를 이동하였다.

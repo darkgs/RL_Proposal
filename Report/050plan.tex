@@ -35,40 +35,105 @@ Ignore         & 마리오가 갇혀있는 상태 \\
 우리 모델을 학습시킬 때 GPU 가속을 통해 연산 효율을 최적화 하기 위해서 CUDA 환경이 설치된 ubuntu 16.04 에서 모델을 학습시키도록 하였다.
 특히 학습시에는 게임을 렌더링하지 않도록 하여 최대한 빠른 시간에 많은 에피소드를 학습할 수 있도록 한다.
 
-\subsection{개발 일정}
-\label{sec:dev:schedule}
-본 프로젝트는 두 사람이 협동하여 4, 5월간 9주에 걸쳐서 수행한다.
-프로젝트 전반부에는 작업의 효율을 위해 개발환경 세팅 및 기존 방법을 구현할 사람과 새로운 방법을 연구할 사람으로 나누어 분업한다.
-Table~\ref{tab:schedule}은 프로젝트 구성원이 각 역활을 수행할 일정을 나타낸다.
-5주차까지 개발환경 세팅과 기존 방법으로 학습해보는 것까지 완료한 후 서로 공유하여 각자 개발환경을 갖출 수 있도록 한다.
-이 후 새로운 방법을 연구한 것을 공유하여 제안 메소드를 협업하여 구현한 후 학습시킨다.
+\subsection{Test Envirnment}
+\label{sec:dev:environment}
+우리 프로젝트의 코드는 python으로 작성되었으며 GPU가속을 통한 학습을 위해 tensorflow 라이브러리를 사용하였다.
+실험에 사용한 컴퓨터는 다음과 같은 사양을 가지고 있다.
+\begin{itemize}
+	\item \textbf{CPU}:
+		Intel Xeon E5-2630 v4 2.2GHz, 25M cache
+	\item \textbf{Memory}:
+		500GB, 2133MHz
+	\item \textbf{GPU}:
+		NVIDIA GTX 1080ti 4개
+\end{itemize}
+모델별로 각각의 실험 세팅에 따라 하나의 GPU를 할당하였으며 효율적인 연산을 위해 GPU 하나당 한번에 5개의 실험을 수행하여 CPU, GPU 자원을 거의 모두 활용하도록 하였다.
+실험 도중에 메모리는 비교적 여유있는 편이었다.
 
-% Please add the following required packages to your document preamble:
-% \usepackage{multirow}
-\begin{table}[]
-\centering
-	\caption {
-		개발 일정.
-		크게 개발환경 설정 및 기존 방법으로 게임을 학습하는 담당과 새로운 방법을 연구 하는 담당으로 나뉜다.
-		이후 개발환경을 공유한 뒤, 새로운 방법 개발에 협력한다.
-	}
-	\label{tab:schedule}
-\begin{tabular}{clccccccccc}
-\toprule
-                     & \multicolumn{1}{c}{} & \multicolumn{4}{c}{4월} & \multicolumn{5}{c}{5월} \\
-                     & \multicolumn{1}{c}{} & 1    & 2   & 3   & 4   & 1  & 2  & 3  & 4  & 5  \\
-\midrule
-\multirow{3}{*}{구본헌} & 개발환경 세팅              & *    & *   & *   &     &    &    &    &    &    \\
-                     & 기존 방법으로 학습           &      &     & *   & *   & *  &    &    &    &    \\
-                     & 제안 방법 개발             &      &     &     &     &    & *  & *  & *  & *  \\
-\midrule
-\multirow{3}{*}{김정훈} & 개발환경 세팅              &      &     & *   &     &    &    &    &    &    \\
-                     & 새로운 방법 연구           & *    & *   & *   & *   & *  &    &    &    &    \\
-                     & 제안 방법 개발             &      &     &     &     &    & *  & *  & *  & * \\
-\bottomrule
-\end{tabular}
-\end{table}
+\subsection{Code Structure}
+\label{sec:dev:code}
+실험에 사용한 코드는 최대한 중복 코드를 피하여 여러 가지 모델을 쉽게 테스트할 수 있도록 설계되었다.
+소스코드의 구조는 아래와 같다.
+%
+\begin{itemize}
+	\item \textbf{main.py}:
+		모델의 train/test의 골격이 되는 구조를 가지고 있다. gym을 통해 마리오 게임을 로드하고 argument에 따라 선택된 모델을 불러와 train이나 test를 수행한다.
+	\item \textbf{ReplayMemory.py}:
+		DQN의 핵심이 되는 replay memory를 구현하고 있다.
+		각각의 행동을 (state, action, reward, next state, done) tuple로 저장하고 있으며 이를 나중에 학습에 활용하게 된다.
+	\item \textbf{DQN.py}:
+		\dqn 모델의 tensorflow graph를 구성하는 코드이다.
+		모델의 생성 및 추론, 학습, 파일로 저장, 불러오기를 수행할 수 있다.
+	\item \textbf{SplitDQN.py}:
+		\sdqn 모델의 tensorflow graph를 구성하는 코드이다.
+		모델에 대한 지원하는 기능은 DQN.py와 같다.
+	\item \textbf{SADQN.py}:
+		\sadqn 모델의 tensorflow graph를 구성하는 코드이다.
+		모델에 대한 지원하는 기능은 DQN.py와 같다.
+	\item \textbf{SADQNp.py}:
+		\sapdqn 모델의 tensorflow graph를 구성하는 코드이다.
+		모델에 대한 지원하는 기능은 DQN.py와 같다.
+\end{itemize}
+%
+위와 같이 모델의 코드를 분리해 놓음으로써 다양한 모델이 그 외 환경에 대한 코드를 공유하여 사용하는 구조이다.
+main.py를 실행할 때 hyper parameter와 모델의 선택에 대한 값들을 인자로 받을 수 있는 데 상세 사항은 아래와 같다.
+%
+\begin{itemize}
+	\item \textbf{--replay\_memory\_total}:
+		Replay memory에서 최대 몇개의 동작을 저장할 지 지정.
+		기본값은 50,000.
+	\item \textbf{--training\_batch\_size}:
+		모델의 학습시 batch의 크기.
+		기본값은 16.
+	\item \textbf{--gamma}:
+		모델의 loss값을 계산할 때, 한 step 다음 state에서 얻을 수 있는 q 기대값에 대한 decay factor.
+		기본값은 0.8.
+	\item \textbf{--learning\_rate}:
+		Gradient descent 를 통해 모델을 학습할 때, adam optimizer의 learning rate.
+		기본값은 1e-3.
+	\item \textbf{--epsilon}:
+		e-greedy 방법을 통해 매 step시 임의의 action을 선택하게 되는 데, 이 경우의 확률값.
+		기본값은 0.02.
+	\item \textbf{--max\_steps}:
+		Train 시 에피소드를 계속 반복하여 학습하게 되는 데, 이때 에피소드들을 통틀어
+		기본값은 1000000.
+\end{itemize}
+%
 
-신경학습망을 통한 모델의 특성상, 하이퍼 파라미터의 세팅에 따라 성능의 변화가 클 가능성이 높다.
-프로젝트 구성원은 각자 가지고 있는 컴퓨팅 환경을 최대한 활용하여 하이퍼 파라미터 세팅을 분배하여 각자 학습하며, 주기적으로 서로의 결과물을 비교하여 더 나은 세팅을 찾도록 한다.
-
+%\subsection{개발 일정}
+%\label{sec:dev:schedule}
+%본 프로젝트는 두 사람이 협동하여 4, 5월간 9주에 걸쳐서 수행한다.
+%프로젝트 전반부에는 작업의 효율을 위해 개발환경 세팅 및 기존 방법을 구현할 사람과 새로운 방법을 연구할 사람으로 나누어 분업한다.
+%Table~\ref{tab:schedule}은 프로젝트 구성원이 각 역활을 수행할 일정을 나타낸다.
+%5주차까지 개발환경 세팅과 기존 방법으로 학습해보는 것까지 완료한 후 서로 공유하여 각자 개발환경을 갖출 수 있도록 한다.
+%이 후 새로운 방법을 연구한 것을 공유하여 제안 메소드를 협업하여 구현한 후 학습시킨다.
+%
+%% Please add the following required packages to your document preamble:
+%% \usepackage{multirow}
+%\begin{table}[]
+%\centering
+%	\caption {
+%		개발 일정.
+%		크게 개발환경 설정 및 기존 방법으로 게임을 학습하는 담당과 새로운 방법을 연구 하는 담당으로 나뉜다.
+%		이후 개발환경을 공유한 뒤, 새로운 방법 개발에 협력한다.
+%	}
+%	\label{tab:schedule}
+%\begin{tabular}{clccccccccc}
+%\toprule
+%                     & \multicolumn{1}{c}{} & \multicolumn{4}{c}{4월} & \multicolumn{5}{c}{5월} \\
+%                     & \multicolumn{1}{c}{} & 1    & 2   & 3   & 4   & 1  & 2  & 3  & 4  & 5  \\
+%\midrule
+%\multirow{3}{*}{구본헌} & 개발환경 세팅              & *    & *   & *   &     &    &    &    &    &    \\
+%                     & 기존 방법으로 학습           &      &     & *   & *   & *  &    &    &    &    \\
+%                     & 제안 방법 개발             &      &     &     &     &    & *  & *  & *  & *  \\
+%\midrule
+%\multirow{3}{*}{김정훈} & 개발환경 세팅              &      &     & *   &     &    &    &    &    &    \\
+%                     & 새로운 방법 연구           & *    & *   & *   & *   & *  &    &    &    &    \\
+%                     & 제안 방법 개발             &      &     &     &     &    & *  & *  & *  & * \\
+%\bottomrule
+%\end{tabular}
+%\end{table}
+%
+%신경학습망을 통한 모델의 특성상, 하이퍼 파라미터의 세팅에 따라 성능의 변화가 클 가능성이 높다.
+%프로젝트 구성원은 각자 가지고 있는 컴퓨팅 환경을 최대한 활용하여 하이퍼 파라미터 세팅을 분배하여 각자 학습하며, 주기적으로 서로의 결과물을 비교하여 더 나은 세팅을 찾도록 한다.
+%
