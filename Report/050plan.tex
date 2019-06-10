@@ -1,7 +1,8 @@
 
-본 절에서는 개발 환경과 프로젝트를 진행하기 위해 거쳤던 진행 상황에 대한 부분을 다룬다.
+본 절에서는 개발 환경과 프로젝트 코드에 대한 내용을 다룬다.
 하위 섹션~\ref{sec:dev:gym}에서는 개발 환경 구성에 핵심이 되는 gym 라이브러리를 소개한다.
-그리고 프로젝트 구성원 각자 개발 일정에 따른 역할을 하위 섹션~\ref{sec:dev:schedule}에서 정한대로 진행을 하였다.
+그리고 실험에 사용한 환경을 하위 섹션~\ref{sec:dev:environment}에서 소개한다.
+마지막으로 하위 섹션~\ref{sec:dev:code}에서 간략히 설명한 후 프로젝트 실행 시 사용할 수 있는 옵션에 대해서 소개한다.
 
 \subsection{OpenAI gym}
 \label{sec:dev:gym}
@@ -95,8 +96,17 @@ main.py를 실행할 때 hyper parameter와 모델의 선택에 대한 값들을
 		e-greedy 방법을 통해 매 step시 임의의 action을 선택하게 되는 데, 이 경우의 확률값.
 		기본값은 0.02.
 	\item \textbf{--max\_steps}:
-		Train 시 에피소드를 계속 반복하여 학습하게 되는 데, 이때 에피소드들을 통틀어
+		Train 시 에피소드를 계속 반복하여 학습하게 되는 데, 이때 에피소드들을 통틀어 학습에 사용하는 최대 step의 값.
 		기본값은 1000000.
+	\item \textbf{--model\_name}:
+		사용할 모델의 이름. DQN, SDQN, SADQN, SAPDQN 중 하나의 값을 가져야 한다.
+		기본값은 DQN.
+	\item \textbf{--play\_mode}:
+		이 옵션은 boolean 타입의 값이며 선언될 경우 학습을 하지 않고 render를 포함에 게임을 플레이 한다.
+		기본값은 false.
+	\item \textbf{--reward\_mode}:
+		서로 다른 reward 함수 중 하나를 선택한다. R0, R1, R2 중 하나의 값을 가져야 한다.
+		기본값은 R0.
 \end{itemize}
 %
 
