@@ -53,12 +53,12 @@ Ignore         & 마리오가 갇혀있는 상태 \\
 
 \subsection{Code Structure}
 \label{sec:dev:code}
-실험에 사용한 코드는 최대한 중복 코드를 피하여 여러 가지 모델을 쉽게 테스트할 수 있도록 설계되었다.
+실험에 사용한 코드는 최대한 중복을 피하여 여러 가지 모델을 쉽게 테스트할 수 있도록 설계되었다.
 소스코드의 구조는 아래와 같다.
 %
 \begin{itemize}
 	\item \textbf{main.py}:
-		모델의 train/test의 골격이 되는 구조를 가지고 있다. gym을 통해 마리오 게임을 로드하고 argument에 따라 선택된 모델을 불러와 train이나 test를 수행한다.
+		모델의 train/test의 골격이 되는 구조를 가지고 있다. gym을 통해 마리오 게임을 로드하고 argument에 따라 선택된 모델을 불러와 train과 test를 수행한다.
 	\item \textbf{ReplayMemory.py}:
 		DQN의 핵심이 되는 replay memory를 구현하고 있다.
 		각각의 행동을 (state, action, reward, next state, done) tuple로 저장하고 있으며 이를 나중에 학습에 활용하게 된다.
